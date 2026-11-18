@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konflikte lösen – Gruppen-Expedition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --kraft:#b98d5e; --kraft2:#a5784a; --paper:#fbf3e3; --paper2:#f3e4c8;
+  --ink:#3a2615; --ink2:#6b4a2e; --line:#d8bf97;
+  --red:#b44a2a; --green:#4f7a36; --gold:#d9a23a; --blue:#3f6c84;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Comic Neue','Comic Sans MS',cursive; color:var(--ink); font-size:18px; line-height:1.45;
+  background:var(--kraft);
+  background-image:
+    radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px),
+    radial-gradient(rgba(0,0,0,.06) 1px,transparent 1px);
+  background-size:14px 14px,22px 22px; background-position:0 0,7px 11px;
+  min-height:100vh;
+}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px 40px}
+h1,h2,h3,.bang{font-family:'Bangers',cursive;letter-spacing:1px;font-weight:400}
+header.top{text-align:center;color:var(--paper);text-shadow:3px 3px 0 var(--ink)}
+header.top h1{font-size:44px;margin:4px 0 0}
+header.top p{margin:0 0 10px;font-weight:700;color:#fff4dc;text-shadow:1px 1px 0 var(--ink)}
+/* progress */
+.path{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0 16px}
+.dot{width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);background:var(--paper2);
+  font-family:'Bangers';font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+.dot.done{background:var(--gold)}
+.dot.now{background:var(--red);color:#fff;transform:scale(1.15)}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--ink);padding:20px 20px 22px;margin-bottom:22px;position:relative}
+.card h2{font-size:34px;margin:0 0 4px;color:var(--red)}
+.kicker{font-family:'Bangers';color:var(--ink2);font-size:18px;letter-spacing:1px}
+.bubble{background:#fff;border:3px solid var(--ink);border-radius:22px;padding:12px 16px;position:relative;margin:12px 0 18px}
+.bubble:after{content:"";position:absolute;left:34px;bottom:-16px;border:8px solid transparent;border-top:12px solid var(--ink)}
+.bubble:before{content:"";position:absolute;left:37px;bottom:-9px;border:5px solid transparent;border-top:9px solid #fff;z-index:2}
+.ab{background:#fff8d6;border:2px dashed var(--ink2);border-radius:10px;padding:10px 14px;margin:14px 0;font-weight:700}
+.ab b.tag{background:var(--ink);color:#fff8d6;border-radius:6px;padding:1px 7px;margin-right:6px;font-family:'Bangers';letter-spacing:1px;font-weight:400}
+.book{background:#e7f0f3;border:2px solid var(--blue);border-radius:10px;padding:10px 14px;margin:12px 0}
+.book b.tag{background:var(--blue);color:#fff;border-radius:6px;padding:1px 7px;margin-right:6px;font-family:'Bangers';letter-spacing:1px;font-weight:400}
+.roles{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.role{background:var(--paper2);border:2px solid var(--ink);border-radius:20px;padding:3px 12px;font-size:15px}
+.role b{color:var(--red)}
+label.l{display:block;font-weight:700;margin:12px 0 4px}
+input[type=text],textarea{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+input:focus,textarea:focus{outline:3px solid var(--gold)}
+.btn{font-family:'Bangers';font-size:22px;letter-spacing:1px;border:3px solid var(--ink);border-radius:12px;padding:8px 18px;cursor:pointer;background:var(--gold);color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.sec{background:var(--paper2)}
+.btn.red{background:var(--red);color:#fff}
+.btn.small{font-size:17px;padding:4px 12px}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.chip{display:inline-block;border:2px solid var(--ink);border-radius:20px;padding:6px 14px;margin:4px 6px 4px 0;background:#fff;cursor:pointer;font-weight:700;font-size:16px;user-select:none}
+.chip.on{background:var(--ink);color:var(--paper)}
+.chip.ok{background:var(--green);color:#fff;border-color:var(--green)}
+.chip.no{background:var(--red);color:#fff;border-color:var(--red)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:700px){.grid4{grid-template-columns:repeat(2,1fr)}header.top h1{font-size:34px}}
+.zone{border:3px solid var(--ink);border-radius:12px;min-height:140px;padding:6px;cursor:pointer;background:#fff}
+.zone h3{margin:0 0 6px;text-align:center;font-size:24px}
+.z-Kampf{background:#f6d2c4}.z-Aushandeln{background:#dfecc8}.z-Flucht{background:#ecd6e4}.z-Gesetze{background:#f6ecbb}
+.zone.target{outline:4px dashed var(--red);outline-offset:2px}
+.scard{display:block;background:#fff;border:2px solid var(--ink);border-radius:8px;padding:6px 9px;margin:5px 0;font-size:15px;font-weight:700;cursor:pointer;line-height:1.25}
+.pool .scard{display:inline-block;margin:5px 6px 5px 0;font-size:16px}
+.scard.sel{background:var(--gold);transform:rotate(-2deg)}
+.scard.ok{background:#cfe6bf;border-color:var(--green)}
+.scard.no{background:#f3c2b3;border-color:var(--red)}
+.pool{background:#e9f1f6;border:2px dashed var(--blue);border-radius:12px;padding:8px;margin:10px 0;min-height:56px}
+.fb{border-radius:10px;padding:10px 14px;margin:10px 0;font-weight:700}
+.fb.good{background:#dcecd0;border:2px solid var(--green)}
+.fb.bad{background:#f7d9cf;border:2px solid var(--red)}
+.fb.info{background:#fff;border:2px solid var(--ink2)}
+.panelrow{border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0;background:#fff}
+.panelrow .num{font-family:'Bangers';font-size:26px;background:var(--ink);color:var(--paper);border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px}
+.glossary{font-size:15px;background:var(--paper2);border-radius:10px;padding:8px 12px;margin-top:10px}
+details summary{cursor:pointer;font-weight:700}
+.q{margin:14px 0;padding:10px 12px;background:#fff;border:2px solid var(--line);border-radius:12px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:16px;font-weight:700;margin:6px 0;padding:8px 12px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);cursor:pointer;color:var(--ink)}
+.opt.ok{background:#cfe6bf;border-color:var(--green)}
+.opt.no{background:#f3c2b3;border-color:var(--red)}
+.fq{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;margin:8px 0}
+.yn .chip{margin:0 4px 0 0;padding:4px 12px}
+.four{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+@media(max-width:600px){.four{grid-template-columns:1fr}}
+.four div{background:#fff;border:3px solid var(--ink);border-radius:12px;padding:10px 12px}
+.four div b.n{font-family:'Bangers';font-size:26px;color:var(--red);margin-right:6px}
+.sol{border:3px solid var(--ink);border-radius:12px;padding:10px 12px;margin:12px 0;background:#fff}
+.sol h3{margin:0 0 4px;font-size:22px}
+.conf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+@media(max-width:700px){.conf{grid-template-columns:repeat(2,1fr)}}
+.conf button{font:inherit;font-weight:700;font-size:15px;border:2px solid var(--ink);border-radius:10px;background:#fff;padding:8px;cursor:pointer;text-align:left;color:var(--ink)}
+.conf button.on{background:var(--gold)}
+.conf button .done{color:var(--green)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+.vs{background:#fbe1d8;border:2px solid var(--red);border-radius:12px;padding:8px 10px}
+.es{background:#e1efd6;border:2px solid var(--green);border-radius:12px;padding:8px 10px}
+.vs h3,.es h3{margin:0;font-size:24px}
+.schema{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-size:16px}
+.schema .row{display:flex;align-items:center;gap:10px;margin:6px 0;flex-wrap:wrap}
+.schema .m{font-family:'Bangers';font-size:20px;letter-spacing:1px;background:var(--paper2);border:2px solid var(--ink);border-radius:8px;padding:2px 8px}
+.summary h3{color:var(--red);font-size:24px;margin:16px 0 4px;border-bottom:2px dashed var(--line)}
+.summary p,.summary li{margin:3px 0}
+.modal{position:fixed;inset:0;background:rgba(40,25,10,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal .card{max-width:420px}
+footer{text-align:center;color:#fff4dc;font-family:'Comic Neue';font-weight:700;text-shadow:1px 1px 0 var(--ink);margin-top:10px;font-size:15px}
+.muted{color:var(--ink2);font-size:15px}
+.hint{font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>💥 Konflikte lösen 🤝</h1>
+    <p>Eine Gruppen-Expedition in 8 Stationen</p>
+  </header>
+  <div class="path" id="path"></div>
+  <div id="app"></div>
+  <footer>Horlacher Ethik Kl. 7 SJ 2026_27</footer>
+</div>
+<div id="modal"></div>
+
+<script>
+/* ---------- Daten ---------- */
+const CATS=["Kampf","Aushandeln","Flucht","Gesetze"];
+const SORT=[
+ {id:"c1",t:"freiwillige Unterwerfung",c:"Flucht"},
+ {id:"c2",t:"Verlassen des Kampfplatzes",c:"Flucht"},
+ {id:"c3",t:"Kompromiss",c:"Aushandeln"},
+ {id:"c4",t:"Rechtsprechung",c:"Gesetze"},
+ {id:"c5",t:"Vernichtung des Gegners",c:"Kampf"},
+ {id:"c6",t:"Unterwerfung unter Schiedsspruch",c:"Gesetze"},
+ {id:"c7",t:"Konsens",c:"Aushandeln"},
+ {id:"c8",t:"erzwungene Unterwerfung des Gegners",c:"Kampf"},
+ {id:"c9",t:"Unterwerfung beider Konfliktparteien durch eine dritte Partei",c:"Gesetze"}
+];
+const PICS={
+ 1:{ok:["Kampf"],txt:"Bild 1 passt zu <b>Kampf</b>: Einer packt den anderen am Kragen und droht ihm. Wer stärker ist, will sich durchsetzen."},
+ 2:{ok:["Kampf","Gesetze"],txt:"Bild 2 zeigt <b>Kampf</b> – aber eine dritte Person geht dazwischen und versucht zu schlichten. Das erinnert an <b>Gesetze</b> (eine dritte Partei entscheidet / trennt). Beides ist mit guter Begründung richtig!"},
+ 3:{ok:["Flucht"],txt:"Bild 3 passt zu <b>Flucht</b>: Die beiden reden nicht mehr miteinander, schauen weg und verschränken die Arme. Der Konflikt ist nicht gelöst – sie gehen ihm aus dem Weg."}
+};
+const COMIC_OPTS=["Streit mit gegenseitiger Schuldzuweisung","Versöhnung","Diskussion / Verhandeln","Drohung","Einer setzt sich durch – der andere gibt auf"];
+const MODEL_OPTS=["Gewinner–Gewinner (Win-Win)","Gewinner–Verlierer: einer setzt sich durch","Gewinner–Verlierer: Kompromiss","Verlierer–Verlierer"];
+const QUIZ=[
+ {q:"Welche zwei Wege nennt der Text, wie Konflikte meistens „gelöst“ werden?",o:["Einer setzt sich durch – oder man findet einen Kompromiss.","Man läuft weg – oder man holt eine Lehrkraft.","Man lost – oder man stimmt ab."],a:0},
+ {q:"Warum gehört auch der Kompromiss zum Gewinner-Verlierer-Modell?",o:["Weil beim Kompromiss immer einer schummelt.","Weil jeder ungefähr die Hälfte von dem verliert, was er eigentlich wollte.","Weil Kompromisse in der Schule verboten sind."],a:1},
+ {q:"Was sagt der Text über Kompromisse?",o:["Sie sind immer die beste Lösung.","Sie beenden jeden Streit für immer.","Sie halten oft nicht lange und führen häufig zu neuen Konflikten."],a:2},
+ {q:"Was bedeutet Verlierer-Verlierer-Modell?",o:["Beide scheitern – keiner bekommt, was er will.","Beide gewinnen ein bisschen.","Einer gewinnt nur ganz knapp."],a:0},
+ {q:"Warum finden manche Menschen ein Verlierer-Verlierer-Ende trotzdem gut?",o:["Weil dann alle wieder Freunde sind.","Weil dann wenigstens der andere auch nichts davon hat.","Weil es am schnellsten geht."],a:1}
+];
+const FQ=[
+ {k:"g",t:"Ist die Lösung gefährlich?",bad:"ja"},
+ {k:"f",t:"Fühlt sich jemand dabei schlecht?",bad:"ja"},
+ {k:"r",t:"Ist die Lösung fair?",bad:"nein"},
+ {k:"w",t:"Wird die Lösung (wahrscheinlich) funktionieren?",bad:"nein"}
+];
+const PRACT=[
+ {id:"A",t:"Jonas schubst Emil von der Platte weg.",exp:{g:"ja",f:"ja",r:"nein",w:"nein"},why:"Schubsen ist gefährlich – damit ist die Lösung sofort raus. Emil fühlt sich mies, und der nächste Streit ist vorprogrammiert. (Kampf)"},
+ {id:"B",t:"Sie losen, wer anfängt, und wechseln sich alle 10 Minuten ab.",exp:{g:"nein",f:"nein",r:"ja",w:"ja"},why:"Ungefährlich, fair, keiner wird benachteiligt – und man kann es gleich ausprobieren. Eine gute Lösung! (Aushandeln)"},
+ {id:"C",t:"Emil gibt nach und geht beleidigt weg.",exp:{g:"nein",f:"ja",r:"nein",w:"nein"},why:"Nicht gefährlich – aber Emil fühlt sich schlecht. Der Ärger ist nur verschoben, nicht gelöst. (Flucht)"},
+ {id:"D",t:"Eine Lehrerin sieht den Streit und verbietet beiden die Platte.",exp:{g:"nein",f:"ja",r:"ja",w:"ja"},why:"Für Ruhe sorgt es – aber beide fühlen sich schlecht und keiner darf spielen. Das ist ein Verlierer-Verlierer-Ende! (Gesetze)"}
+];
+const CONFLICTS=[
+ {id:"k1",t:"Lea verschickt ohne Neles Zustimmung Handyfotos"},
+ {id:"k2",t:"Max nimmt Murats CD aus dem Rucksack"},
+ {id:"k3",t:"Annalena kommt ohne Entschuldigung nicht zur Geburtstagsparty"},
+ {id:"k4",t:"Mats lässt aus Spaß Maltes Sportbeutel verschwinden"},
+ {id:"k5",t:"Lara wirft Papierschnipsel in die Klasse, beschuldigt aber Lasse"},
+ {id:"k6",t:"Bastian verrät seiner Clique Claras Geheimnis"}
+];
+const ROLES=[
+ ["📖","Vorleser:in","liest die Aufgaben laut vor"],
+ ["⌨️","Tipper:in","bedient das Tablet"],
+ ["📝","AB-Chef:in","achtet darauf, dass alle ihr Arbeitsblatt ausfüllen"],
+ ["📣","Sprecher:in","stellt am Ende eure Ergebnisse vor"]
+];
+const STEPS=["Start","Bildtitel","Vier Wege","Bilder","Konfliktlösungsmodelle","Modelle","4-Fragen-Test","Verschärfen?","Bewerten","Ziel"];
+
+/* ---------- Zustand ---------- */
+const KEY="konflikte-loesen-7-v2";
+function fresh(){return{step:0,max:0,group:"",title:{},sort:{},sortChecked:false,pics:{1:[],2:[],3:[]},picWhy:{},picChecked:false,comic:{},comicChecked:false,th:{},quiz:{},showSchema:false,model:{},missing:null,llEnd:"",modelChecked:false,pr:{},prChecked:{},cur:"k1",k:{},rate:{},rateWhy:{},ww:{},wwShow:false,sel:null}}
+let S=fresh();
+try{const s=localStorage.getItem(KEY);if(s)S=Object.assign(fresh(),JSON.parse(s));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function getP(p){return p.split(".").reduce((o,k)=>o==null?undefined:o[k],S)}
+function setP(p,v){const ks=p.split(".");let o=S;ks.slice(0,-1).forEach(k=>{if(o[k]==null||typeof o[k]!=="object")o[k]={};o=o[k]});o[ks.at(-1)]=v;save();}
+const inp=(p,ph="")=>`<input type="text" data-k="${p}" value="${esc(getP(p))}" placeholder="${esc(ph)}">`;
+const ta=(p,ph="")=>`<textarea data-k="${p}" placeholder="${esc(ph)}">${esc(getP(p))}</textarea>`;
+
+function names(){return S.names.map(n=>n.trim()).filter(Boolean)}
+function rolesHTML(){
+  const n=names(); if(!n.length) return "";
+  return `<div class="roles">${ROLES.map((r,i)=>`<span class="role">${r[0]} ${r[1]}: <b>${esc(n[(i+S.step)%n.length])}</b></span>`).join("")}</div>`;
+}
+function head(kick,title,intro){
+  return `<div class="kicker">${kick}</div><h2>${title}</h2>${intro?`<div class="bubble">${intro}</div>`:""}`;
+}
+function nav(nextLabel="Weiter ➜"){
+  return `<div class="nav">${S.step>0?`<button class="btn sec" data-act="prev">⬅ Zurück</button>`:"<span></span>"}<button class="btn" data-act="next">${nextLabel}</button></div>`;
+}
+
+/* ---------- Stationen ---------- */
+const V=[];
+V[0]=()=>`<div class="card">
+ <div class="kicker">Willkommen!</div><h2>Bevor es losgeht …</h2>
+ <div class="bubble">Ihr habt schon viel über Konflikte gelernt: Eisbergmodell, 4-Ohren-Modell, Konflikttypen, Gewalt, Ich-Botschaften und den Win-Win-Fahrplan. Jetzt geht es um die große Frage: <b>Wie kann man Konflikte lösen – und welche Lösung ist wirklich gut?</b></div>
+ <label class="l">Euer Gruppenname</label>${inp("group","z. B. Die Streitschlichter")}
+ <div class="ab"><b class="tag">So geht's</b> Lest jede Station gemeinsam, besprecht euch und tippt eure Antworten ein. Wechselt euch am Tablet ab – alle sollen mal drankommen!</div>
+ <div class="book"><b class="tag">Ihr braucht</b> euer Ethikbuch (S. 20 und 21), das Arbeitsblatt „Konflikte … lösen“ und einen Stift. <b>Jede:r</b> füllt das eigene Arbeitsblatt aus!</div>
+ ${nav("Los geht's! ➜")}</div>`;
+
+V[1]=()=>`<div class="card">${head("Station 1 · Buch S. 20, Aufgabe 1 + 2","Was geht in ihnen vor?","Schlagt das Buch auf S. 20 auf und schaut euch die drei Fotos genau an. Gebt jedem Bild einen passenden Titel.")}
+ ${[1,2,3].map(i=>`<div class="panelrow"><span class="num">${i}</span><b>Titel für Bild ${i}</b>${inp("title."+i,"z. B. „…“")}</div>`).join("")}
+ <div class="ab"><b class="tag">📝 AB</b> Schreibt eure drei Titel bei <b>Aufgabe 1</b> auf.</div>
+ <div class="book"><b class="tag">🗣️ Mündlich</b> <b>Aufgabe 2:</b> Was sagen oder denken die Personen? Sprecht für jedes Bild die Sprech- oder Gedankenblasen in eurer Gruppe laut – gern mit verteilten Rollen! Aufschreiben müsst ihr das nicht.</div>
+ ${nav()}</div>`;
+
+V[2]=()=>{
+  const placed=SORT.filter(c=>S.sort[c.id]); const pool=SORT.filter(c=>!S.sort[c.id]);
+  const cls=c=>S.sortChecked&&S.sort[c.id]?(S.sort[c.id]===c.c?"ok":"no"):"";
+  let fb="";
+  if(S.sortChecked){const r=SORT.filter(c=>S.sort[c.id]===c.c).length;
+    fb=r===9?`<div class="fb good">🎉 Alle 9 richtig! Super!</div>`:`<div class="fb bad">${r} von 9 richtig. Die roten Karten noch mal antippen und neu zuordnen!</div>`;}
+  return `<div class="card">${head("Station 2 · Buch S. 20, Aufgabe 3","Vier Wege aus dem Konflikt","Es gibt vier Oberbegriffe für Konfliktlösungen: <b>Kampf, Aushandeln, Flucht, Gesetze</b>. Ordnet die 9 Karten zu: <b>Karte antippen ➜ dann den Kasten antippen.</b> Eine falsch gelegte Karte tippt ihr einfach noch mal an.")}
+  <div class="pool">${pool.length?pool.map(c=>`<span class="scard ${S.sel===c.id?"sel":""}" data-act="pick" data-id="${c.id}">${c.t}</span>`).join(""):'<span class="muted">Alle Karten liegen! Jetzt prüfen ⬇</span>'}</div>
+  <div class="grid4">${CATS.map(k=>`<div class="zone z-${k} ${S.sel?"target":""}" data-act="drop" data-cat="${k}"><h3>${k}</h3>${placed.filter(c=>S.sort[c.id]===k).map(c=>`<span class="scard ${cls(c)}" data-act="unpick" data-id="${c.id}">${c.t}</span>`).join("")}</div>`).join("")}</div>
+  <div style="margin-top:12px"><button class="btn" data-act="checkSort">✔ Prüfen</button></div>${fb}
+  <details class="glossary"><summary>❓ Schwierige Wörter</summary>
+   <b>Unterwerfung</b> = nachgeben, sich fügen · <b>Konsens</b> = alle sind mit der Lösung einverstanden · <b>Kompromiss</b> = jeder gibt ein Stück nach · <b>Schiedsspruch</b> = Entscheidung einer unparteiischen Person (wie ein Schiedsrichter) · <b>Rechtsprechung</b> = ein Gericht entscheidet nach Gesetzen</details>
+  <div class="ab"><b class="tag">📝 AB</b> Tragt die Begriffe in die Tabelle (Kampf – Aushandeln – Flucht – Gesetze) ein.</div>
+  ${nav()}</div>`;
+};
+
+V[3]=()=>`<div class="card">${head("Station 3 · Buch S. 20, Aufgabe 4","Welches Bild passt wozu?","Schaut euch noch einmal die drei Fotos auf S. 20 an. Welche Konfliktlösung zeigt welches Bild? Mehrere Antworten sind möglich – <b>wichtig ist eure Begründung!</b>")}
+ ${[1,2,3].map(i=>`<div class="panelrow"><span class="num">${i}</span><b>Bild ${i}</b><div style="margin-top:6px">
+   ${CATS.map(k=>{const on=S.pics[i].includes(k);let c=on?"on":"";if(S.picChecked&&on)c=PICS[i].ok.includes(k)?"ok":"no";return `<span class="chip ${c}" data-act="pic" data-i="${i}" data-cat="${k}">${k}</span>`}).join("")}</div>
+   <label class="l">Weil …</label>${inp("picWhy."+i,"Begründung")}
+   ${S.picChecked?`<div class="fb info">💡 ${PICS[i].txt}</div>`:""}</div>`).join("")}
+ <button class="btn" data-act="checkPics">💡 Unsere Idee anzeigen</button>
+ <div class="ab"><b class="tag">📝 AB</b> Schreibt die Bildnummern (1, 2, 3) in die passende Spalte der Tabelle.</div>
+ ${nav()}</div>`;
+
+V[4]=()=>`<div class="card">${head("Station 4 · Buch S. 21, Aufgabe b1","Konfliktlösungsmodelle","Schaut euch den Comic rechts auf S. 21 an. Bild 1 zeigt den Konflikt, die Bilder 2 bis 5 zeigen, wie er ausgehen kann. Zuerst: Was denken die beiden in Bild 1?")}
+ <div class="panelrow"><span class="num">1</span><b>Gedankenblasen für Bild 1</b>
+  <label class="l">Der Mann im Jackett (links) denkt …</label>${inp("th.a","„…“")}
+  <label class="l">Der Mann mit Brille und kariertem Hemd (rechts) denkt …</label>${inp("th.b","„…“")}</div>
+ <p><b>Jetzt beschreibt ihr jedes Bild mit einem passenden Titel:</b></p>
+ ${[1,2,3,4,5].map(i=>{const v=S.comic[i];let st="";if(S.comicChecked&&v!=null)st=+v===i-1?"ok":"no";
+   return `<div class="panelrow"><span class="num">${i}</span>${COMIC_OPTS.map((o,j)=>`<span class="chip ${+v===j&&v!=null?(st||"on"):""}" data-act="comic" data-i="${i}" data-j="${j}">${o}</span>`).join("")}</div>`}).join("")}
+ <button class="btn" data-act="checkComic">✔ Prüfen</button>
+ ${S.comicChecked?(()=>{const r=[1,2,3,4,5].filter(i=>+S.comic[i]===i-1&&S.comic[i]!=null).length;return r===5?`<div class="fb good">🎉 Alles richtig! Bild 4 und 5 gehören übrigens zusammen: Erst wird gedroht – dann gibt einer auf.</div>`:`<div class="fb bad">${r} von 5 richtig. Schaut euch die roten noch mal genau an: Gesten, Gesichter, Abstand!</div>`})():""}
+ <div class="ab"><b class="tag">📝 AB</b> Hier gibt es nichts einzutragen – merkt euch die Bilder für die nächste Station!</div>
+ ${nav()}</div>`;
+
+V[5]=()=>{
+  const allQ=QUIZ.every((_,i)=>S.quiz[i]===QUIZ[i].a);
+  const mOk={2:[0],3:[2,0],45:[1]};
+  return `<div class="card">${head("Station 5 · Buch S. 21, Text + Aufgabe b2","Gewinner? Verlierer?","Lest den Text <b>„Konflikte werden üblicherweise …“</b> auf S. 21 gemeinsam laut. Beantwortet dann die Fragen.")}
+  ${QUIZ.map((q,i)=>`<div class="q"><b>${i+1}. ${q.q}</b>${q.o.map((o,j)=>{let c="";if(S.quiz[i]!=null&&+S.quiz[i]===j)c=j===q.a?"ok":"no";return `<button class="opt ${c}" data-act="quiz" data-i="${i}" data-j="${j}">${o}</button>`}).join("")}</div>`).join("")}
+  ${allQ?`<div class="fb good">🎉 Alle Fragen richtig! Jetzt könnt ihr das Schaubild ergänzen.</div>`:""}
+  <div class="ab"><b class="tag">📝 AB</b> Ergänzt das Schaubild: Was gehört hinter <b>Gewinner-Verlierer-Modell &lt;</b> (zwei Äste!) und hinter <b>Verlierer-Verlierer-Modell –</b>?</div>
+  <button class="btn sec small" data-act="schema">${S.showSchema?"Schaubild verstecken":"🔍 Schaubild zum Vergleichen zeigen"}</button>
+  ${S.showSchema?`<div class="schema" style="margin-top:10px">
+    <div class="row"><span class="m">Gewinner-Verlierer-Modell</span><span>&lt;</span><span>① Eine Partei setzt sich durch → es gibt einen klaren Verlierer<br>② Kompromiss → jeder verliert die Hälfte; oft unzuverlässig, führt zu Folgekonflikten</span></div>
+    <div class="row"><span class="m">Verlierer-Verlierer-Modell</span><span>–</span><span>beide scheitern, keiner bekommt etwas („damit wenigstens der andere auch nichts davon hat“)</span></div></div>`:""}
+  <h3 class="bang" style="font-size:26px;margin:20px 0 4px;color:var(--red)">Zurück zum Comic</h3>
+  <p>Welches Modell zeigen die Ausgänge im Comic?</p>
+  ${[[2,"Bild 2"],[3,"Bild 3"],[45,"Bild 4 + 5"]].map(([k,l])=>{const v=S.model[k];return `<div class="panelrow"><b>${l}</b><div>${MODEL_OPTS.map((o,j)=>{let c=v!=null&&+v===j?"on":"";if(S.modelChecked&&c)c=mOk[k].includes(j)?"ok":"no";return `<span class="chip ${c}" data-act="model" data-k="${k}" data-j="${j}">${o}</span>`}).join("")}</div></div>`}).join("")}
+  <div class="panelrow"><b>Welches Modell fehlt im Comic?</b><div>${MODEL_OPTS.map((o,j)=>{let c=S.missing!=null&&+S.missing===j?"on":"";if(S.modelChecked&&c)c=j===3?"ok":"no";return `<span class="chip ${c}" data-act="missing" data-j="${j}">${o}</span>`}).join("")}</div></div>
+  <button class="btn" data-act="checkModel">✔ Prüfen</button>
+  ${S.modelChecked?`<div class="fb info">💡 <b>Bild 2:</b> Versöhnung – beide sind zufrieden: Gewinner–Gewinner. <b>Bild 3:</b> Sie verhandeln auf Augenhöhe – das führt oft zu einem Kompromiss (wenn beide ganz zufrieden sind, sogar zu Win-Win). <b>Bild 4+5:</b> Einer droht, der andere gibt auf – einer setzt sich durch. <b>Es fehlt:</b> das Verlierer-Verlierer-Modell!</div>`:""}
+  <label class="l">Statt zu zeichnen: Beschreibt in 2–3 Sätzen, wie ein Verlierer-Verlierer-Ende im Comic aussehen könnte.</label>
+  ${ta("llEnd","Am Ende …")}
+  ${nav()}</div>`;
+};
+
+V[6]=()=>`<div class="card">${head("Station 6 · Buch S. 21, Text c","Der Vier-Fragen-Test","Woran erkennt man eine <b>gute</b> Lösung? Lest den Text unten auf S. 21 („Wie lässt sich das Problem lösen? …“). Er gibt euch vier Prüffragen:")}
+ <div class="four">${FQ.map((f,i)=>`<div><b class="n">${i+1}</b><b>${f.t}</b><br><span class="hint">${f.bad==="ja"?"Wenn <b>ja</b>":"Wenn <b>nein</b>"} → ${i===3?"etwas anderes Faires und Ungefährliches ausprobieren.":"schlechte Lösung, kommt nicht in Frage!"}</span></div>`).join("")}</div>
+ <p class="muted">nach: Anne Wilkens, Knigge für Kids (Buch S. 21)</p>
+ <div class="bubble"><b>Jetzt testet ihr!</b> Jonas und Emil wollen in der Pause beide an die einzige freie Tischtennisplatte. Prüft jede Lösung mit den vier Fragen.</div>
+ ${PRACT.map(p=>{const a=S.pr[p.id]||{};const done=FQ.every(f=>a[f.k]);let verdict="";
+  if(S.prChecked[p.id]){const bad=FQ.find(f=>a[f.k]===f.bad);
+   verdict=`<div class="fb ${bad?"bad":"good"}">Euer Ergebnis: ${bad?`❌ schlechte Lösung (Frage ${FQ.indexOf(bad)+1})`:"✅ gute Lösung!"}<br><span style="font-weight:400">💡 ${p.why}</span></div>`;}
+  return `<div class="sol"><h3>Lösung ${p.id}</h3><b>${p.t}</b>
+   ${FQ.map(f=>`<div class="fq"><span>${f.t}</span><span class="yn">${["ja","nein"].map(v=>`<span class="chip ${a[f.k]===v?"on":""}" data-act="pr" data-id="${p.id}" data-q="${f.k}" data-v="${v}">${v}</span>`).join("")}</span></div>`).join("")}
+   <button class="btn small" data-act="checkPr" data-id="${p.id}" ${done?"":"disabled style='opacity:.5'"}>Auswerten</button>${verdict}</div>`}).join("")}
+ <div class="ab"><b class="tag">📝 AB / Hefter</b> Schreibt die vier Fragen auf die Rückseite eures Arbeitsblatts – ihr braucht sie gleich!</div>
+ ${nav()}</div>`;
+
+V[7]=()=>{
+  const c=CONFLICTS.find(x=>x.id===S.cur)||CONFLICTS[0];const d=S.k[c.id]||{};const q=d.q||{};
+  const doneK=id=>S.k[id]&&(S.k[id].v||S.k[id].e);
+  const allQ=FQ.every(f=>q[f.k]);const bad=FQ.find(f=>q[f.k]===f.bad);
+  return `<div class="card">${head("Station 7 · Arbeitsblatt unten","Verschärfen oder entschärfen?","Sucht euch einen Konflikt aus. Überlegt: Was würde ihn <b>schlimmer</b> machen? Was würde ihn <b>entschärfen</b>? Nutzt alles, was ihr kennt: Ich-Botschaften, 4 Ohren, Win-Win-Fahrplan …")}
+  <div class="conf">${CONFLICTS.map(x=>`<button class="${x.id===c.id?"on":""}" data-act="conf" data-id="${x.id}">${doneK(x.id)?'<span class="done">✔ </span>':""}${x.t}</button>`).join("")}</div>
+  <div class="bubble"><b>${c.t}</b></div>
+  <div class="two"><div class="vs"><h3>🔥 verschärfen</h3>${ta("k."+c.id+".v","Was würde den Streit schlimmer machen?")}</div>
+   <div class="es"><h3>💧 entschärfen</h3>${ta("k."+c.id+".e","Was würde den Streit beruhigen / lösen?")}</div></div>
+  <details class="glossary"><summary>💡 Ideen-Tipp</summary><b>Verschärfen:</b> zurückschlagen, beleidigen, andere aufhetzen, im Klassenchat lästern, Rache planen, alles abstreiten …<br><b>Entschärfen:</b> erst mal abkühlen, ruhig nachfragen, Ich-Botschaft („Ich bin sauer, weil …“), zuhören, sich entschuldigen, Wiedergutmachung, gemeinsam Lösungen sammeln (Win-Win-Fahrplan) …</details>
+  <p><b>Macht den Vier-Fragen-Test mit eurer Entschärfen-Idee:</b></p>
+  ${FQ.map(f=>`<div class="fq"><span>${f.t}</span><span class="yn">${["ja","nein"].map(v=>`<span class="chip ${q[f.k]===v?"on":""}" data-act="kq" data-id="${c.id}" data-q="${f.k}" data-v="${v}">${v}</span>`).join("")}</span></div>`).join("")}
+  ${allQ?(bad?`<div class="fb bad">❌ Eure Idee fällt bei Frage ${FQ.indexOf(bad)+1} durch. Findet eine bessere Entschärfen-Idee!</div>`:`<div class="fb good">✅ Eure Idee besteht den Test – sie ist ungefährlich, fair und hat gute Chancen!</div>`):""}
+  <div class="ab"><b class="tag">📝 AB</b> Tragt eure Stichpunkte in die Tabelle „Konflikte verschärfen oder entschärfen?“ ein. Noch Zeit? Nehmt einen zweiten Konflikt!</div>
+  ${nav()}</div>`;
+};
+
+V[8]=()=>`<div class="card">${head("Station 8 · Buch S. 20, Aufgabe 5c + 5d","Was ist eine gute Lösung?","Jetzt seid ihr die Expert:innen! Bewertet die vier Wege aus Station 2. Welche sind sinnvoll, welche eher nicht?")}
+ ${CATS.map(k=>`<div class="panelrow"><b class="bang" style="font-size:24px">${k}</b><div>${[["👍","sinnvoll"],["🤔","kommt drauf an"],["👎","eher nicht"]].map(([e,l])=>`<span class="chip ${S.rate[k]===l?"on":""}" data-act="rate" data-cat="${k}" data-v="${l}">${e} ${l}</span>`).join("")}</div>
+  <label class="l">Weil …</label>${inp("rateWhy."+k,"Begründung")}</div>`).join("")}
+ <div class="book"><b class="tag">Erinnert euch</b> Beim <b>Win-Win-Fahrplan</b> sollen <b>beide</b> gewinnen: erst abkühlen, dann jede:r schildert die eigene Sicht mit Ich-Botschaften, Gefühle und Wünsche werden ausgesprochen, man sammelt gemeinsam Lösungen und einigt sich auf eine, mit der beide zufrieden sind. (Schaut in euren Hefter!)</div>
+ <label class="l">Welcher Weg passt am besten zum Win-Win-Fahrplan?</label>
+ <div>${CATS.map(k=>`<span class="chip ${S.ww.best===k?"on":""}" data-act="ww" data-f="best" data-cat="${k}">${k}</span>`).join("")}</div>
+ ${inp("ww.bestWhy","Weil …")}
+ <label class="l">Welcher Weg widerspricht dem Win-Win-Fahrplan am meisten?</label>
+ <div>${CATS.map(k=>`<span class="chip ${S.ww.worst===k?"on":""}" data-act="ww" data-f="worst" data-cat="${k}">${k}</span>`).join("")}</div>
+ ${inp("ww.worstWhy","Weil …")}
+ <div style="margin-top:12px"><button class="btn sec small" data-act="wwShow">${S.wwShow?"Verstecken":"💡 Was meint ihr? – Unsere Sicht zum Vergleich"}</button></div>
+ ${S.wwShow?`<div class="fb info">💡 <b>Aushandeln</b> passt am besten – vor allem der <b>Konsens</b>: Beide reden miteinander und sind am Ende einverstanden. Ein Kompromiss ist ok, aber jeder verliert ein Stück.<br><b>Kampf</b> widerspricht dem Fahrplan am meisten: Einer verliert, oft wird es gefährlich.<br><b>Flucht</b> beendet den Streit nur scheinbar – das Problem bleibt.<br><b>Gesetze / dritte Partei</b> sind manchmal nötig (z. B. bei Gewalt oder wenn man allein nicht weiterkommt). Ein Streitschlichter kann helfen – die Lösung sollten aber am besten die Streitenden selbst finden.</div>`:""}
+ <div class="ab"><b class="tag">📝 Hefter</b> Notiert eure Bewertung kurz im Hefter – eine:r von euch stellt sie gleich vor.</div>
+ ${nav("Zum Ziel 🏁")}</div>`;
+
+function summaryText(){
+  const L=[];
+  L.push(`KONFLIKTE LÖSEN – Gruppe: ${S.group||"–"}`);
+  L.push("\n1) Bildtitel");[1,2,3].forEach(i=>L.push(`Bild ${i}: ${S.title[i]||"–"}`));
+  L.push("\n2) Vier Wege");CATS.forEach(k=>L.push(`${k}: ${SORT.filter(c=>S.sort[c.id]===k).map(c=>c.t).join(", ")||"–"}`));
+  L.push("\n3) Bilder");[1,2,3].forEach(i=>L.push(`Bild ${i}: ${S.pics[i].join(", ")||"–"} – weil ${S.picWhy[i]||"–"}`));
+  L.push("\n4) Comic – Gedanken Bild 1");L.push(`links: „${S.th.a||"–"}“ / rechts: „${S.th.b||"–"}“`);
+  L.push("\n5) Verlierer-Verlierer-Ende");L.push(S.llEnd||"–");
+  L.push("\n7) Verschärfen / Entschärfen");CONFLICTS.forEach(c=>{const d=S.k[c.id];if(d&&(d.v||d.e))L.push(`${c.t}\n  verschärfen: ${d.v||"–"}\n  entschärfen: ${d.e||"–"}`)});
+  L.push("\n8) Bewertung");CATS.forEach(k=>L.push(`${k}: ${S.rate[k]||"–"} – ${S.rateWhy[k]||""}`));
+  L.push(`Passt am besten zum Win-Win-Fahrplan: ${S.ww.best||"–"} – ${S.ww.bestWhy||""}`);
+  L.push(`Widerspricht am meisten: ${S.ww.worst||"–"} – ${S.ww.worstWhy||""}`);
+  return L.join("\n");
+}
+V[9]=()=>{
+  return `<div class="card summary"><div class="kicker">🏁 Geschafft!</div><h2>Ihr seid Konfliktlöse-Profis!</h2>
+  <div class="bubble">Einigt euch, wer gleich eure Ergebnisse vorstellt – vor allem Station 7 (euer Konflikt) und Station 8 (eure Bewertung). Prüft noch einmal: Hat <b>jede:r</b> das Arbeitsblatt vollständig ausgefüllt?</div>
+  <h3>Gruppe: ${esc(S.group||"–")}</h3>
+  <h3>Unser Konflikt (Station 7)</h3>${CONFLICTS.filter(c=>S.k[c.id]&&(S.k[c.id].v||S.k[c.id].e)).map(c=>`<p><b>${c.t}</b><br>🔥 ${esc(S.k[c.id].v||"–")}<br>💧 ${esc(S.k[c.id].e||"–")}</p>`).join("")||"<p>–</p>"}
+  <h3>Unsere Bewertung (Station 8)</h3><ul>${CATS.map(k=>`<li><b>${k}:</b> ${esc(S.rate[k]||"–")} ${S.rateWhy[k]?"– "+esc(S.rateWhy[k]):""}</li>`).join("")}</ul>
+  <p><b>Passt am besten zum Win-Win-Fahrplan:</b> ${esc(S.ww.best||"–")} ${S.ww.bestWhy?"– "+esc(S.ww.bestWhy):""}</p>
+  <h3>Merksatz</h3><p style="font-size:20px"><b>Eine gute Konfliktlösung ist ungefährlich, fair, keiner fühlt sich schlecht – und sie funktioniert. Am besten gewinnen beide!</b></p>
+  <div class="nav"><button class="btn sec" data-act="prev">⬅ Zurück</button><button class="btn" data-act="copy">📋 Alle Ergebnisse kopieren</button><button class="btn red" data-act="reset">🔄 Neu starten</button></div>
+  <p id="copymsg" class="muted"></p></div>`;
+};
+
+/* ---------- Rendern ---------- */
+const app=document.getElementById("app");
+function render(keepScroll){
+  document.getElementById("path").innerHTML=STEPS.map((s,i)=>`<div class="dot ${i===S.step?"now":i<=S.max?"done":""}" title="${s}" data-act="go" data-i="${i}">${i===0?"★":i===9?"🏁":i}</div>`).join("");
+  app.innerHTML=V[S.step]();
+  if(!keepScroll) window.scrollTo({top:0,behavior:"smooth"});
+}
+function go(i){S.step=Math.max(0,Math.min(9,i));S.max=Math.max(S.max,S.step);S.sel=null;save();render();}
+
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.k;if(k)setP(k,e.target.value);});
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-act]");if(!t)return;const a=t.dataset.act,d=t.dataset;
+  const re=()=>{save();render(true)};
+  switch(a){
+    case"next":go(S.step+1);break;
+    case"prev":go(S.step-1);break;
+    case"go":if(+d.i<=S.max)go(+d.i);break;
+    case"pick":S.sel=S.sel===d.id?null:d.id;re();break;
+    case"drop":if(S.sel){S.sort[S.sel]=d.cat;S.sel=null;S.sortChecked=false;re();}break;
+    case"unpick":e.stopPropagation();delete S.sort[d.id];S.sortChecked=false;S.sel=d.id;re();break;
+    case"checkSort":S.sortChecked=true;re();break;
+    case"pic":{const l=S.pics[d.i];const ix=l.indexOf(d.cat);ix>=0?l.splice(ix,1):l.push(d.cat);re();break;}
+    case"checkPics":S.picChecked=true;re();break;
+    case"comic":S.comic[d.i]=+d.j;S.comicChecked=false;re();break;
+    case"checkComic":S.comicChecked=true;re();break;
+    case"quiz":S.quiz[d.i]=+d.j;re();break;
+    case"schema":S.showSchema=!S.showSchema;re();break;
+    case"model":S.model[d.k]=+d.j;S.modelChecked=false;re();break;
+    case"missing":S.missing=+d.j;S.modelChecked=false;re();break;
+    case"checkModel":S.modelChecked=true;re();break;
+    case"pr":S.pr[d.id]=S.pr[d.id]||{};S.pr[d.id][d.q]=d.v;S.prChecked[d.id]=false;re();break;
+    case"checkPr":S.prChecked[d.id]=true;re();break;
+    case"conf":S.cur=d.id;re();break;
+    case"kq":S.k[d.id]=S.k[d.id]||{};S.k[d.id].q=S.k[d.id].q||{};S.k[d.id].q[d.q]=d.v;re();break;
+    case"rate":S.rate[d.cat]=d.v;re();break;
+    case"ww":S.ww[d.f]=d.cat;re();break;
+    case"wwShow":S.wwShow=!S.wwShow;re();break;
+    case"copy":{const m=document.getElementById("copymsg");
+      try{navigator.clipboard.writeText(summaryText()).then(()=>m.textContent="✅ Kopiert! Ihr könnt es z. B. in LernSax oder eine Nachricht einfügen.",()=>showText());}catch(err){showText();}break;}
+    case"reset":confirmReset();break;
+    case"yesReset":S=fresh();save();closeModal();render();break;
+    case"close":closeModal();break;
+  }
+});
+function showText(){document.getElementById("modal").innerHTML=`<div class="modal"><div class="card"><h2>Ergebnisse</h2><p class="muted">Kopieren hat nicht geklappt – markiert den Text und kopiert ihn selbst:</p><textarea style="min-height:260px">${esc(summaryText())}</textarea><div class="nav"><span></span><button class="btn" data-act="close">OK</button></div></div></div>`;}
+function confirmReset(){document.getElementById("modal").innerHTML=`<div class="modal"><div class="card"><h2>Wirklich neu starten?</h2><p>Alle Eingaben eurer Gruppe werden gelöscht.</p><div class="nav"><button class="btn sec" data-act="close">Nein, zurück</button><button class="btn red" data-act="yesReset">Ja, löschen</button></div></div></div>`;}
+function closeModal(){document.getElementById("modal").innerHTML="";}
+render(true);
+</script>
+</body>
+</html>
